@@ -1,0 +1,75 @@
+CREATE DATABASE InventoryDB;
+
+USE InventoryDB;
+
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Category VARCHAR(50),
+    UnitPrice DECIMAL(10, 2),
+    StockQuantity INT
+);
+
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY,
+    SupplierName VARCHAR(100),
+    ContactName VARCHAR(50),
+    ContactEmail VARCHAR(100)
+);
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    OrderDate DATE,
+    SupplierID INT,
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+
+CREATE TABLE OrderItems (
+    OrderItemID INT PRIMARY KEY,
+    OrderID INT,
+    ProductID INT,
+    Quantity INT,
+    UnitPrice DECIMAL(10, 2),
+    TotalPrice DECIMAL(10, 2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+INSERT INTO Products (ProductID, ProductName, Category, UnitPrice, StockQuantity)
+VALUES
+    (1, 'Laptop', 'Electronics', 800.00, 50),
+    (2, 'Smartphone', 'Electronics', 400.00, 100),
+    (3, 'Headphones', 'Electronics', 50.00, 200);
+
+INSERT INTO Suppliers (SupplierID, SupplierName, ContactName, ContactEmail)
+VALUES
+    (1, 'Electro Market', 'Can Al', 'can.al@example.com'),
+    (2, 'electronics store', 'ayse ok', 'ayse.ok@example.com');
+
+INSERT INTO Orders (OrderID, OrderDate, SupplierID)
+VALUES
+    (1, '2023-01-15', 1),
+    (2, '2023-02-20', 2);
+INSERT INTO OrderItems (OrderItemID, OrderID, ProductID, Quantity, UnitPrice, TotalPrice)
+VALUES
+    (1, 1, 1, 20, 800.00, 16000.00),
+    (2, 1, 2, 30, 400.00, 12000.00),
+    (3, 2, 3, 50, 50.00, 2500.00);
+
+
+SELECT
+    ProductName,
+    StockQuantity
+FROM
+    Products;
+
+
+SELECT
+    Suppliers.SupplierName,
+    SUM(OrderItems.TotalPrice) AS TotalSpending
+FROM
+    Orders
+JOIN OrderItems ON Orders.OrderID = OrderItems.OrderID
+JOIN Suppliers ON Orders.SupplierID = Suppliers.SupplierID
+GROUP BY
+    Suppliers.SupplierName;
